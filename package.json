@@ -1,15 +1,13 @@
 {
-  "name": "analytics-node",
-  "repository": "git://github.com/segmentio/analytics-node",
-  "version": "1.2.2",
+  "name": "zhuge-node",
+  "repository": "git://github.com/weflex/zhuge-node",
+  "version": "1.0.0",
   "description": "The hassle-free way to integrate analytics into any node application.",
   "keywords": [
     "analytics",
-    "segment.io",
-    "segmentio",
+    "zhuge.io",
     "client",
-    "driver",
-    "analytics"
+    "driver"
   ],
   "main": "lib/index.js",
   "browserify": {
