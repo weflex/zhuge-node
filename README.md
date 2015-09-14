@@ -59,16 +59,7 @@ analytics.page({
 
 ## License
 
-  WWWWWW||WWWWWW
-   W W W||W W W
-        ||
-      ( OO )__________
-       /  |           \
-      /o o|    MIT     \
-      \___/||_||__||_|| *
-           || ||  || ||
-          _||_|| _||_||
-         (__|__|(__|__|
+MIT
 
 Copyright &copy; 2015 WeFlex Inc.
 
