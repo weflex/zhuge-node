@@ -9,18 +9,66 @@ A node.js client for [Zhuge](https://zhugeio.com) — The hassle-free way to int
 $ npm install --save zhuge-node
 ```
 
-## License (MIT)
+## Quickstart
 
-    WWWWWW||WWWWWW
-     W W W||W W W
-          ||
-        ( OO )__________
-         /  |           \
-        /o o|    MIT     \
-        \___/||_||__||_|| *
-             || ||  || ||
-            _||_|| _||_||
-           (__|__|(__|__|
+```js
+const Analytics = require('zhuge-node');
+const analytics = new Analytics({
+  'appid': 'YOUR APPID',
+  'secret': 'APP SECRET'
+}, {
+  // The number of messages to enqueue before flushing.
+  flushAt: 20,
+  // The number of milliseconds to wait before flushing the queue automatically.
+  flushAfter: 10000
+});
+
+// identify user
+analytics.identify({
+  userId:'f4ca124298',
+  traits: {
+    name: 'Michael Bolton',
+    email: 'mbolton@initech.com',
+    createdAt: new Date('2014-06-14T02:00:19.467Z')
+  }
+});
+
+// track action
+// Note: before you define the event, you should register it before.
+analytics.track({
+  userId:'f4ca124298',
+  event: 'Signed Up',
+  properties: {
+    plan: 'Enterprise'
+  }
+});
+
+// page view
+analytics.page({
+  userId: '019mr8mf4r',
+  category: 'Docs',
+  name: 'Node.js Library',
+  properties: {
+    url: 'https://segment.com/docs/libraries/node',
+    path: '/docs/libraries/node/',
+    title: 'Node.js Library - Segment',
+    referrer: 'https://github.com/segmentio/analytics-node'
+  }
+});
+```
+
+## License
+
+  WWWWWW||WWWWWW
+   W W W||W W W
+        ||
+      ( OO )__________
+       /  |           \
+      /o o|    MIT     \
+      \___/||_||__||_|| *
+           || ||  || ||
+          _||_|| _||_||
+         (__|__|(__|__|
 
 Copyright &copy; 2015 WeFlex Inc.
 
