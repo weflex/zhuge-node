@@ -1,7 +1,9 @@
-var assert = require('assert');
-var Analytics = require('..');
-var async = require('async');
-var server = require('./server');
+'use strict';
+
+const assert = require('assert');
+const Analytics = require('..');
+const async = require('async');
+const server = require('./server');
 
 var a;
 var noop = function(){};
@@ -20,7 +22,7 @@ describe('Analytics', function(){
       },
       function(cb){
         server.app
-          .post('/v1/batch', server.fixture)
+          .post('/open/v1/event_statis_srv/upload_event', server.fixture)
           .listen(server.ports.source, cb);
       }
     ], done);
@@ -53,7 +55,7 @@ describe('Analytics', function(){
   it('should set default options', function(){
     var a = Analytics('key');
     assert.equal(a.writeKey, 'key');
-    assert.equal(a.host, 'https://api.segment.io');
+    assert.equal(a.host, 'https://apipool.zhugeio.com');
     assert.equal(a.flushAt, 20);
     assert.equal(a.flushAfter, 10000);
   });
@@ -78,11 +80,17 @@ describe('Analytics', function(){
 
   describe('#enqueue', function(){
     it('should add a message to the queue', function(){
-      var date = new Date();
+      var date = parseInt(Date.now() / 1000);
       a.enqueue('type', { timestamp: date }, noop);
 
       assert.deepEqual(a.queue[0], {
-        message: { type: 'type', timestamp: date, context: context },
+        message: {
+          cuid: undefined,
+          eid: undefined,
+          et: 'type',
+          ts: date, 
+          pr: { context: context },
+        },
         callback: noop
       });
     });
@@ -122,9 +130,9 @@ describe('Analytics', function(){
 
     it('should extend the given context', function(){
       a.enqueue('type', { event: 'test', context: { name: 'travis' } }, noop);
-      assert.deepEqual(a.queue[0].message.context, {
+      assert.deepEqual(a.queue[0].message.pr.context, {
         library: {
-          name:'analytics-node',
+          name:'zhuge-node',
           version: require('../package.json').version
         },
         name: 'travis'
@@ -142,10 +150,8 @@ describe('Analytics', function(){
       enqueue(a, [1, 2, 3]);
       a.flush(function(err, data){
         if (err) return done(err);
-        assert.deepEqual(data.batch, [1, 2]);
-        assert(data.timestamp instanceof Date);
-        assert(data.sentAt instanceof Date);
-        assert(data.messageId && /[a-zA-Z0-9]{8}/.test(data.messageId));
+        assert.deepEqual(data.data, [1, 2]);
+        assert(typeof data.ts === 'number');
         done();
       });
     });
@@ -177,13 +183,14 @@ describe('Analytics', function(){
 
   describe('#identify', function(){
     it('should enqueue a message', function(){
-      var date = new Date();
+      var date = parseInt(Date.now() / 1000);
       a.identify({ userId: 'id', timestamp: date });
       assert.deepEqual(a.queue[0].message, {
-        type: 'identify',
-        userId: 'id',
-        timestamp: date,
-        context: context
+        et: 'idf',
+        eid: undefined,
+        cuid: 'id',
+        ts: date,
+        pr: { context: context }
       });
     });
 
@@ -198,58 +205,59 @@ describe('Analytics', function(){
     });
   });
 
-  describe('#group', function(){
-    it('should enqueue a message', function(){
-      var date = new Date();
-      a.group({ groupId: 'group', userId: 'user', timestamp: date });
-      assert.deepEqual(a.queue[0].message, {
-        type: 'group',
-        userId: 'user',
-        groupId: 'group',
-        timestamp: date,
-        context: context
-      });
-    });
+  // TODO(Yorkie): Not implemented
+  // describe('#group', function(){
+  //   it('should enqueue a message', function(){
+  //     var date = new Date();
+  //     a.group({ groupId: 'group', userId: 'user', timestamp: date });
+  //     assert.deepEqual(a.queue[0].message, {
+  //       type: 'group',
+  //       userId: 'user',
+  //       groupId: 'group',
+  //       timestamp: date,
+  //       context: context
+  //     });
+  //   });
 
-    it('should validate a message', function(){
-      assert.throws(a.group, error('You must pass a message object.'));
-    });
+  //   it('should validate a message', function(){
+  //     assert.throws(a.group, error('You must pass a message object.'));
+  //   });
 
-    it('should require a userId or anonymousId', function(){
-      assert.throws(function(){
-        a.group({});
-      }, error('You must pass either an "anonymousId" or a "userId".'));
-    });
+  //   it('should require a userId or anonymousId', function(){
+  //     assert.throws(function(){
+  //       a.group({});
+  //     }, error('You must pass either an "anonymousId" or a "userId".'));
+  //   });
 
-    it('should require a groupId', function(){
-      assert.throws(function(){
-        a.group({ userId: 'id' });
-      }, error('You must pass a "groupId".'));
-    });
-  });
+  //   it('should require a groupId', function(){
+  //     assert.throws(function(){
+  //       a.group({ userId: 'id' });
+  //     }, error('You must pass a "groupId".'));
+  //   });
+  // });
 
   describe('#track', function(){
     it('should enqueue a message', function(){
-      var date = new Date();
+      var date = parseInt(Date.now() / 1000);
       a.track({ userId: 'id', event: 'event', timestamp: date });
       assert.deepEqual(a.queue[0].message, {
-        type: 'track',
-        event: 'event',
-        userId: 'id',
-        timestamp: date,
-        context: context
+        et: 'cus',
+        eid: 'event',
+        cuid: 'id',
+        ts: date,
+        pr: { 'context': context }
       });
     });
 
     it('should handle a user ids given as a number', function(){
-      var date = new Date();
+      var date = parseInt(Date.now() / 1000);
       a.track({ userId: 1, event: 'jumped the shark', timestamp: date });
       assert.deepEqual(a.queue[0].message, {
-        userId: 1,
-        event: 'jumped the shark',
-        type: 'track',
-        timestamp: date,
-        context: context
+        cuid: 1,
+        eid: 'jumped the shark',
+        et: 'cus',
+        ts: date,
+        pr: { 'context': context }
       })
     });
 
@@ -272,13 +280,23 @@ describe('Analytics', function(){
 
   describe('#page', function(){
     it('should enqueue a message', function(){
-      var date = new Date();
-      a.page({ userId: 'id', timestamp: date });
+      var date = parseInt(Date.now() / 1000);
+      a.page({ 
+        userId: 'id', 
+        name: 'name',
+        category: 'category',
+        timestamp: date 
+      });
       assert.deepEqual(a.queue[0].message, {
-        type: 'page',
-        userId: 'id',
-        timestamp: date,
-        context: context
+        et: 'cus',
+        eid: undefined,
+        cuid: 'id',
+        ts: date,
+        pr: {
+          name: 'name',
+          category: 'category',
+          context: context
+        }
       });
     });
 
@@ -293,35 +311,36 @@ describe('Analytics', function(){
     });
   });
 
-  describe('#alias', function(){
-    it('should enqueue a message', function(){
-      var date = new Date();
-      a.alias({ previousId: 'previous', userId: 'id', timestamp: date });
-      assert.deepEqual(a.queue[0].message, {
-        type: 'alias',
-        previousId: 'previous',
-        userId: 'id',
-        timestamp: date,
-        context: context
-      });
-    });
+  // TODO(Yorkie): Not implemented
+  // describe('#alias', function(){
+  //   it('should enqueue a message', function(){
+  //     var date = new Date();
+  //     a.alias({ previousId: 'previous', userId: 'id', timestamp: date });
+  //     assert.deepEqual(a.queue[0].message, {
+  //       type: 'alias',
+  //       previousId: 'previous',
+  //       userId: 'id',
+  //       timestamp: date,
+  //       context: context
+  //     });
+  //   });
 
-    it('should validate a message', function(){
-      assert.throws(a.alias, error('You must pass a message object.'));
-    });
+  //   it('should validate a message', function(){
+  //     assert.throws(a.alias, error('You must pass a message object.'));
+  //   });
 
-    it('should require a userId', function(){
-      assert.throws(function(){
-        a.alias({});
-      }, error('You must pass a "userId".'));
-    });
+  //   it('should require a userId', function(){
+  //     assert.throws(function(){
+  //       a.alias({});
+  //     }, error('You must pass a "userId".'));
+  //   });
 
-    it('should require a previousId', function(){
-      assert.throws(function(){
-        a.alias({ userId: 'id' });
-      }, error('You must pass a "previousId".'));
-    });
-  });
+  //   it('should require a previousId', function(){
+  //     assert.throws(function(){
+  //       a.alias({ userId: 'id' });
+  //     }, error('You must pass a "previousId".'));
+  //   });
+  // });
 });
 
 /**
