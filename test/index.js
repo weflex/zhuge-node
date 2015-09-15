@@ -7,7 +7,7 @@ var a;
 var noop = function(){};
 var context = {
   library: {
-    name: 'analytics-node',
+    name: 'zhuge-node',
     version: require('../package.json').version
   }
 };
