@@ -1,7 +1,7 @@
 
 # zhuge-node
 
-A node.js client for [Zhuge](https://zhugeio.com) — The hassle-free way to integrate analytics into any application.
+A node.js client for [诸葛](https://zhugeio.com) — The hassle-free way to integrate analytics into any application.
 
 ## Installation
 
