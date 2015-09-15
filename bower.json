@@ -1,0 +1,21 @@
+{
+  "name": "zhuge.js",
+  "main": [
+    "dist/zhuge-node.js"
+  ],
+  "version": "1.5.0",
+  "authors": [
+    "Yazhong Liu <yorkiefixer@gmail.com>"
+  ],
+  "description": "The hassle-free way to integrate analytics into any node application.",
+  "keywords": [
+    "analytics",
+    "zhuge"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "node_modules",
+    "test",
+    "lib"
+  ]
+}

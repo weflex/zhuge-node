@@ -3,10 +3,11 @@ browserify = ./node_modules/.bin/browserify
 mocha = ./node_modules/.bin/mocha
 
 # Build the browserify bundle.
-analytics-node.js: node_modules lib/index.js
+build: node_modules lib/index.js
+	mkdir -p dist
 	@$(browserify) lib/index.js \
 		--standalone Analytics \
-		--outfile analytics-node.js
+		--outfile dist/zhuge-node.js
 
 # Install the node module dependencies.
 node_modules: package.json
@@ -20,7 +21,7 @@ test: node_modules
 		--bail
 
 clean:
-	@rm analytics-node.js
+	@rm dist/zhuge-node.js
 
 # Phonies.
 .PHONY: test
