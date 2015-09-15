@@ -9,6 +9,14 @@ A node.js client for [Zhuge](https://zhugeio.com) — The hassle-free way to int
 $ npm install --save zhuge-node
 ```
 
+### Install via bower
+
+```bash
+$ bower install zhuge-node
+```
+
+The above command would be used at client-side.
+
 ## Quickstart
 
 ```js
