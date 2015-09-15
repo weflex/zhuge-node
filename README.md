@@ -1,6 +1,8 @@
 
 # zhuge-node
 
+[![Build Status](https://travis-ci.org/weflex/zhuge-node.svg?branch=master)](https://travis-ci.org/weflex/zhuge-node)
+
 A node.js client for [诸葛](https://zhugeio.com) — The hassle-free way to integrate analytics into any application.
 
 ## Installation
